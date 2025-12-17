@@ -187,7 +187,44 @@ public class Main {
         }
         return bestDay;
     }
-    public static String bestMonthForCommodity(String commodity) { return "DUMMY"; }
+    public static String bestMonthForCommodity(String commodity) {
+        // 1. Find the index of the given commodity (e.g., "Silver" -> 2)
+        int commodityIndex = -1;
+        for (int c = 0; c < COMMS; c++) {
+            if (commodities[c].equals(commodity)) {
+                commodityIndex = c;
+                break;
+            }
+        }
+
+        // validation: If commodity name is not found
+        if (commodityIndex == -1) {
+            return "INVALID_COMMODITY";
+        }
+
+        int maxProfit = Integer.MIN_VALUE;
+        String bestMonth = "";
+
+        // 2. iterate through all 12 months
+        for (int m = 0; m < MONTHS; m++) {
+            int currentMonthTotal = 0;
+
+            // Sum up profit for all 28 days of this month
+            for (int d = 0; d < DAYS; d++) {
+                currentMonthTotal += allData[m][d][commodityIndex];
+            }
+
+            // 3.check if this month beat the record
+            if (currentMonthTotal > maxProfit) {
+                maxProfit = currentMonthTotal;
+                bestMonth = months[m];
+            }
+        }
+
+        // Return just the month name (e.g., "February")
+        return bestMonth;
+    }
+
     public static int consecutiveLossDays(String commodity) { return 0; }
     public static int daysAboveThreshold(String commodity, int threshold) { return 0; }
     public static int biggestDailySwing(int month) { return 0; }
