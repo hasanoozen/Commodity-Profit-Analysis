@@ -82,10 +82,76 @@ public class Main {
     }
 
     // --- analytics methods (To be implemented) ---
-    public static String mostProfitableCommodityInMonth(int month) { return "DUMMY"; }
-    public static int totalProfitOnDay(int month, int day) { return 0; }
+    public static String mostProfitableCommodityInMonth(int month) {
+        // Validation: Check if month is valid (0-11)
+        if (month < 0 || month >= MONTHS) {
+            return "INVALID_MONTH";
+        }
+
+        int maxProfit = Integer.MIN_VALUE; // Start with the smallest possible number
+        String bestCommodity = "";
+
+        // Loop through all 5 commodities
+        for (int c = 0; c < COMMS; c++) {
+            int totalProfitForCommodity = 0;
+
+            // Sum profit across all 28 days for this specific commodity
+            for (int d = 0; d < DAYS; d++) {
+                totalProfitForCommodity += allData[month][d][c];
+            }
+
+            // Is this the best one so far?
+            if (totalProfitForCommodity > maxProfit) {
+                maxProfit = totalProfitForCommodity;
+                bestCommodity = commodities[c];
+            }
+        }
+
+        // Expected Format: "Gold 12500"
+        return bestCommodity + " " + maxProfit;
+    }
+    public static int totalProfitOnDay(int month, int day) {
+        // Validation: Month 0-11, Day 1-28
+        if (month < 0 || month >= MONTHS || day < 1 || day > DAYS) {
+            return -99999;
+        }
+
+        int total = 0;
+        // Sum profits of all 5 commodities for that specific day
+        // Note: day - 1 is used because array index starts at 0
+        for (int c = 0; c < COMMS; c++) {
+            total += allData[month][day - 1][c];
+        }
+
+        return total;
+    }
     public static int commodityProfitInRange(String commodity, int fromDay, int toDay) { return 0; }
-    public static int bestDayOfMonth(int month) { return 0; }
+    public static int bestDayOfMonth(int month) {
+        // validation
+        if (month < 0 || month >= MONTHS) {
+            return -1;
+        }
+
+        int maxProfit = Integer.MIN_VALUE;
+        int bestDay = -1;
+
+        // check each of the 28 days
+        for (int d = 0; d < DAYS; d++) {
+            int dailyTotal = 0;
+
+            // Calculate total profit for day 'd' (Sum of all commodities)
+            for (int c = 0; c < COMMS; c++) {
+                dailyTotal += allData[month][d][c];
+            }
+
+            // Update best day if current day is better
+            if (dailyTotal > maxProfit) {
+                maxProfit = dailyTotal;
+                bestDay = d + 1; // Convert index (0-27) to real day (1-28)
+            }
+        }
+        return bestDay;
+    }
     public static String bestMonthForCommodity(String commodity) { return "DUMMY"; }
     public static int consecutiveLossDays(String commodity) { return 0; }
     public static int daysAboveThreshold(String commodity, int threshold) { return 0; }
