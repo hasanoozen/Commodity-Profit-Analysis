@@ -125,7 +125,42 @@ public class Main {
 
         return total;
     }
-    public static int commodityProfitInRange(String commodity, int fromDay, int toDay) { return 0; }
+    public static int commodityProfitInRange(String commodity, int fromDay, int toDay) {
+        // validation: Days must be within 1-28 range and ordered correctly
+        if (fromDay < 1 || toDay > DAYS || fromDay > toDay) {
+            return 0;
+        }
+        //find the commodity index (e.g., "Gold" -> 0)
+        int commodityIndex = -1;
+        for (int c = 0; c < COMMS; c++) {
+            if (commodities[c].equals(commodity)) {
+                commodityIndex = c;
+                break;
+            }
+        }
+
+        //if commodity name is invalid, return 0
+        if (commodityIndex == -1) {
+            return 0;
+        }
+
+        int totalProfit = 0;
+
+        //explanation
+        // the requirement says "profit in that day range".
+        // i interpreted this as a cumulative sum across ALL 12 MONTHS.
+        // reasoning: This allows us to analyze trends, such as:
+        // "How much profit do we usually make in the first 5 days of every month combined?"
+        for (int m = 0; m < MONTHS; m++) {
+            for (int d = fromDay; d <= toDay; d++) {
+                // Note: d-1 because array uses 0 based indexing
+                totalProfit += allData[m][d - 1][commodityIndex];
+                //i interpreted this as a cumulative sum across ALL 12 MONTHS to analyze trends.
+                //For example: How much profit do we make in the first 5 days of every month combined
+            }
+        }
+        return totalProfit;
+    }
     public static int bestDayOfMonth(int month) {
         // validation
         if (month < 0 || month >= MONTHS) {
