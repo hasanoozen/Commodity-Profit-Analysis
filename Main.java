@@ -81,7 +81,8 @@ public class Main {
         }
     }
 
-    // --- analytics methods (To be implemented) ---
+    // --- analytics methods ---
+
     public static String mostProfitableCommodityInMonth(int month) {
         // Validation: Check if month is valid (0-11)
         if (month < 0 || month >= MONTHS) {
@@ -110,6 +111,7 @@ public class Main {
         // Expected Format: "Gold 12500"
         return bestCommodity + " " + maxProfit;
     }
+
     public static int totalProfitOnDay(int month, int day) {
         // Validation: Month 0-11, Day 1-28
         if (month < 0 || month >= MONTHS || day < 1 || day > DAYS) {
@@ -118,17 +120,17 @@ public class Main {
 
         int total = 0;
         // Sum profits of all 5 commodities for that specific day
-        // Note: day - 1 is used because array index starts at 0
         for (int c = 0; c < COMMS; c++) {
             total += allData[month][day - 1][c];
         }
 
         return total;
     }
+
     public static int commodityProfitInRange(String commodity, int fromDay, int toDay) {
         // validation: Days must be within 1-28 range and ordered correctly
         if (fromDay < 1 || toDay > DAYS || fromDay > toDay) {
-            return 0;
+            return -99999;
         }
         //find the commodity index (e.g., "Gold" -> 0)
         int commodityIndex = -1;
@@ -139,28 +141,22 @@ public class Main {
             }
         }
 
-        //if commodity name is invalid, return 0
+        //if commodity name is invalid
         if (commodityIndex == -1) {
-            return 0;
+            return -99999;
         }
 
         int totalProfit = 0;
 
-        //explanation
-        // the requirement says "profit in that day range".
-        // i interpreted this as a cumulative sum across ALL 12 MONTHS.
-        // reasoning: This allows us to analyze trends, such as:
-        // "How much profit do we usually make in the first 5 days of every month combined?"
+        //explanation: cumulative sum across ALL 12 MONTHS.
         for (int m = 0; m < MONTHS; m++) {
             for (int d = fromDay; d <= toDay; d++) {
-                // Note: d-1 because array uses 0 based indexing
                 totalProfit += allData[m][d - 1][commodityIndex];
-                //i interpreted this as a cumulative sum across ALL 12 MONTHS to analyze trends.
-                //For example: How much profit do we make in the first 5 days of every month combined
             }
         }
         return totalProfit;
     }
+
     public static int bestDayOfMonth(int month) {
         // validation
         if (month < 0 || month >= MONTHS) {
@@ -187,8 +183,9 @@ public class Main {
         }
         return bestDay;
     }
+
     public static String bestMonthForCommodity(String commodity) {
-        // 1. Find the index of the given commodity (e.g., "Silver" -> 2)
+        // 1. Find the index of the given commodity
         int commodityIndex = -1;
         for (int c = 0; c < COMMS; c++) {
             if (commodities[c].equals(commodity)) {
@@ -221,13 +218,108 @@ public class Main {
             }
         }
 
-        // Return just the month name (e.g., "February")
         return bestMonth;
     }
 
-    public static int consecutiveLossDays(String commodity) { return 0; }
-    public static int daysAboveThreshold(String commodity, int threshold) { return 0; }
-    public static int biggestDailySwing(int month) { return 0; }
+    public static int consecutiveLossDays(String commodity) {
+        // commodity index
+        int commodityIndex = -1;
+        for (int c = 0; c < COMMS; c++) {
+            if (commodities[c].equals(commodity)) {
+                commodityIndex = c;
+                break;
+            }
+        }
+
+        if (commodityIndex == -1) return -1;
+
+        int maxStreak = 0;
+        int currentStreak = 0;
+
+        // iterate through all days of the year sequentially
+        for (int m = 0; m < MONTHS; m++) {
+            for (int d = 0; d < DAYS; d++) {
+                int profit = allData[m][d][commodityIndex];
+
+                if (profit < 0) {
+                    currentStreak++;
+                } else {
+                    if (currentStreak > maxStreak) {
+                        maxStreak = currentStreak;
+                    }
+                    currentStreak = 0;
+                }
+            }
+        }
+
+        if (currentStreak > maxStreak) {
+            maxStreak = currentStreak;
+        }
+
+        return maxStreak;
+    }
+
+    public static int daysAboveThreshold(String commodity, int threshold) {
+        int count = 0;
+
+        // find commodity index
+        int commodityIndex = -1;
+        for (int c = 0; c < COMMS; c++) {
+            if (commodities[c].equals(commodity)) {
+                commodityIndex = c;
+                break;
+            }
+        }
+
+        if (commodityIndex == -1) return -1;
+
+        // scan all months and days
+        for (int m = 0; m < MONTHS; m++) {
+            for (int d = 0; d < DAYS; d++) {
+                if (allData[m][d][commodityIndex] > threshold) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+
+    public static int biggestDailySwing(int month) {
+        // validation
+        if (month < 0 || month >= MONTHS) return -99999;
+
+        int maxSwing = 0;
+
+        // 1. Calculate total profit for the very first day (Day 0)
+        int previousDayTotal = 0;
+        for (int c = 0; c < COMMS; c++) {
+            previousDayTotal += allData[month][0][c];
+        }
+
+        // 2. Iterate from Day 1 to Day 27 (comparing each day with the previous one)
+        for (int d = 1; d < DAYS; d++) {
+            int currentDayTotal = 0;
+
+            // Sum commodities for the current day
+            for (int c = 0; c < COMMS; c++) {
+                currentDayTotal += allData[month][d][c];
+            }
+
+            // Calculate Absolute Difference (Swing)
+            int diff = Math.abs(currentDayTotal - previousDayTotal);
+
+            if (diff > maxSwing) {
+                maxSwing = diff;
+            }
+
+            // Update previous day for the next iteration
+            previousDayTotal = currentDayTotal;
+        }
+
+        return maxSwing;
+    }
+
     public static String compareTwoCommodities(String c1, String c2) { return "DUMMY"; }
     public static String bestWeekOfMonth(int month) { return "DUMMY"; }
 }
