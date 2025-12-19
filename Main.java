@@ -320,6 +320,64 @@ public class Main {
         return maxSwing;
     }
 
-    public static String compareTwoCommodities(String c1, String c2) { return "DUMMY"; }
-    public static String bestWeekOfMonth(int month) { return "DUMMY"; }
+
+    public static String compareTwoCommodities(String c1, String c2) {
+        int idx1 = -1, idx2 = -1;
+
+        // i find indices for both commodities
+        for (int c = 0; c < COMMS; c++) {
+            if (commodities[c].equals(c1)) idx1 = c;
+            if (commodities[c].equals(c2)) idx2 = c;
+        }
+
+        // if any commodity is invalid
+        if (idx1 == -1 || idx2 == -1) return "INVALID_COMMODITY";
+
+        int count1 = 0; // Wins for c1
+        int count2 = 0; // Wins for c2
+
+        // iterate entire year (all months, all days)
+        for (int m = 0; m < MONTHS; m++) {
+            for (int d = 0; d < DAYS; d++) {
+                int p1 = allData[m][d][idx1];
+                int p2 = allData[m][d][idx2];
+
+                if (p1 > p2) count1++;
+                else if (p2 > p1) count2++;
+                // if equal, nobody gets a point
+            }
+        }
+
+        return c1 + ": " + count1 + ", " + c2 + ": " + count2;
+    }
+
+    public static String bestWeekOfMonth(int month) {
+        // validation
+        if (month < 0 || month >= MONTHS) return "INVALID_MONTH";
+
+        int bestWeekProfit = Integer.MIN_VALUE;
+        int bestWeekIndex = -1;
+
+        // we have exactly 4 weeks of 7 days
+        for (int w = 0; w < 4; w++) {
+            int currentWeekProfit = 0;
+            int startDay = w * 7;      // 0, 7, 14, 21 (indices)
+            int endDay = startDay + 7; // The loop will go up to this (exclusive)
+
+            // sum profit for these 7 days (across all commodities)
+            for (int d = startDay; d < endDay; d++) {
+                for (int c = 0; c < COMMS; c++) {
+                    currentWeekProfit += allData[month][d][c];
+                }
+            }
+
+            // check if this week is the winner
+            if (currentWeekProfit > bestWeekProfit) {
+                bestWeekProfit = currentWeekProfit;
+                bestWeekIndex = w + 1; // 1, 2, 3, 4
+            }
+        }
+
+        return "Week " + bestWeekIndex;
+    }
 }
