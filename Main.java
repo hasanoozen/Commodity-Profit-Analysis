@@ -324,19 +324,19 @@ public class Main {
     public static String compareTwoCommodities(String c1, String c2) {
         int idx1 = -1, idx2 = -1;
 
-        // i find indices for both commodities
+        // i find indices
         for (int c = 0; c < COMMS; c++) {
             if (commodities[c].equals(c1)) idx1 = c;
             if (commodities[c].equals(c2)) idx2 = c;
         }
 
-        // if any commodity is invalid
+        // invalid commodity check
         if (idx1 == -1 || idx2 == -1) return "INVALID_COMMODITY";
 
         int count1 = 0; // Wins for c1
         int count2 = 0; // Wins for c2
 
-        // iterate entire year (all months, all days)
+        // iterate entire year
         for (int m = 0; m < MONTHS; m++) {
             for (int d = 0; d < DAYS; d++) {
                 int p1 = allData[m][d][idx1];
@@ -344,13 +344,16 @@ public class Main {
 
                 if (p1 > p2) count1++;
                 else if (p2 > p1) count2++;
-                // if equal, nobody gets a point
             }
         }
-
-        return c1 + ": " + count1 + ", " + c2 + ": " + count2;
+        if (count1 > count2) {
+            return c1 + " is better by " + (count1 - count2);
+        } else if (count2 > count1) {
+            return c2 + " is better by " + (count2 - count1);
+        } else {
+            return "Equal";
+        }
     }
-
     public static String bestWeekOfMonth(int month) {
         // validation
         if (month < 0 || month >= MONTHS) return "INVALID_MONTH";
